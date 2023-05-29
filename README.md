@@ -7,18 +7,32 @@ build scripts and include their artifacts in your package distributions.
 ## Installation
 
 To set up `hatch-build-scripts` for your project you'll need to configure it in your
-project's `pyproject.toml` file. You'll need to modify two sections of the file:
-
-- `build-system.requires`: To add `hatch-build-scripts` as a build dependency.
-- `tool.hatch.build.hooks.build-scripts`: To configure the build scripts you want to run.
-
-In practice this looks like
+project's `pyproject.toml` file as a `build-system` requirement:
 
 ```toml
 [build-system]
 requires = ["hatchling", "hatch-build-scripts"]
 build-backend = "hatchling.build"
+```
 
+## Usage
+
+Now you'll need to configure the build scripts you want to run. This is done by adding
+an array of scripts to the `tool.hatch.build.hooks.build-scripts.scripts` key in your
+`pyproject.toml` file. Each script is configured with the following keys:
+
+| Key | Default | Description |
+| --- | ------- | ----------- |
+| `commands` | required | An array of commands to run. Each command is run in a separate shell. |
+| `artifacts` | required | An array of artifact patterns (same as `.gitignore`) to include in your package distributions. |
+| `out_dir` | `"."` | The directory to run the commands in. |
+| `work_dir` | `"."` | The directory to run the commands in. All artifact patterns are relative to this directory. |
+| `clean_artifacts` | `true` | Whether to clean files from the `out_dir` that match the artifact patterns before running the commands. |
+| `clean_out_dir` | `false` | Whether to clean the `out_dir` before running the commands. |
+
+In practice this looks like:
+
+```toml
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 out_dir = "out"
 commands = [
@@ -29,4 +43,16 @@ artifacts = [
     "hello.txt",
     "goodbye.txt",
 ]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+# you can add more scripts here...
 ```
+
+You can configure script defaults for scripts by adding a `[tool.hatch.build.hooks.build-scripts]` table to your `pyproject.toml` file. The following keys are supported:
+
+| Key | Default | Description |
+| --- | ------- | ----------- |
+| `out_dir` | `"."` | The directory to run the commands in. |
+| `work_dir` | `"."` | The directory to run the commands in. All artifact patterns are relative to this directory. |
+| `clean_artifacts` | `true` | Whether to clean files from the `out_dir` that match the artifact patterns before running the commands. |
+| `clean_out_dir` | `false` | Whether to clean the `out_dir` before running the commands. |

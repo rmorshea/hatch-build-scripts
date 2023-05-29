@@ -1,7 +1,7 @@
 """Register hooks for the plugin."""
 from hatchling.plugin import hookimpl
 
-from .plugin import BuildScriptsHook
+from hatch_build_scripts.plugin import BuildScriptsHook
 
 
 @hookimpl

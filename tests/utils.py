@@ -1,22 +1,22 @@
 from __future__ import annotations
 
-from pathlib import Path
 import subprocess
 import sys
-from typing import Sequence, Iterator
-import toml
 import zipfile
-from dataclasses import asdict
 from contextlib import contextmanager
+from dataclasses import asdict
+from pathlib import Path
+from typing import Iterator, Sequence
+
+import toml
 
 import hatch_build_scripts
-from hatch_build_scripts.plugin import ScriptConfig
-
+from hatch_build_scripts.plugin import OneScriptConfig
 
 ROOT_DIR = Path(__file__).parent.parent
 
 
-def create_project(path: Path | str, scripts: Sequence[ScriptConfig]) -> FakeProject:
+def create_project(path: Path | str, scripts: Sequence[OneScriptConfig]) -> FakeProject:
     path = Path(path)
 
     full_config = {
@@ -53,9 +53,20 @@ class FakeProject:
 
     def build(self) -> None:
         subprocess.run(
-            [sys.executable, "-m", "pip", "cache", "remove", hatch_build_scripts.__name__], cwd=self.path, check=True
+            [  # noqa: S603
+                sys.executable,
+                "-m",
+                "pip",
+                "cache",
+                "remove",
+                hatch_build_scripts.__name__,
+            ],
+            cwd=self.path,
+            check=True,
         )
-        subprocess.run([sys.executable, "-m", "hatch", "build"], cwd=self.path, check=True)
+        subprocess.run(
+            [sys.executable, "-m", "hatch", "build"], cwd=self.path, check=True  # noqa: S603
+        )
 
     @contextmanager
     def dist(self) -> Iterator[zipfile.ZipFile]:

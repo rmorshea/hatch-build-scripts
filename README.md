@@ -30,4 +30,3 @@ artifacts = [
     "goodbye.txt",
 ]
 ```
-

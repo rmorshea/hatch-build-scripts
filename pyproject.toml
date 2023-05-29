@@ -26,9 +26,9 @@ classifiers = [
 dependencies = ["pathspec", "hatchling"]
 
 [project.urls]
-Documentation = "https://github.com/unknown/hatch-build-scripts#readme"
-Issues = "https://github.com/unknown/hatch-build-scripts/issues"
-Source = "https://github.com/unknown/hatch-build-scripts"
+Documentation = "https://github.com/rmorshea/hatch-build-scripts#readme"
+Issues = "https://github.com/rmorshea/hatch-build-scripts/issues"
+Source = "https://github.com/rmorshea/hatch-build-scripts"
 
 [tool.hatch.version]
 path = "hatch_build_scripts/__init__.py"

@@ -25,7 +25,7 @@ an array of scripts to the `tool.hatch.build.hooks.build-scripts.scripts` key in
 | --- | ------- | ----------- |
 | `commands` | required | An array of commands to run. Each command is run in a separate shell. |
 | `artifacts` | required | An array of artifact patterns (same as `.gitignore`) to include in your package distributions. |
-| `out_dir` | `"."` | The directory to run the commands in. |
+| `out_dir` | `"."` | The directory to copy artifacts into. |
 | `work_dir` | `"."` | The directory to run the commands in. All artifact patterns are relative to this directory. |
 | `clean_artifacts` | `true` | Whether to clean files from the `out_dir` that match the artifact patterns before running the commands. |
 | `clean_out_dir` | `false` | Whether to clean the `out_dir` before running the commands. |
@@ -52,7 +52,7 @@ You can configure script defaults for scripts by adding a `[tool.hatch.build.hoo
 
 | Key | Default | Description |
 | --- | ------- | ----------- |
-| `out_dir` | `"."` | The directory to run the commands in. |
+| `out_dir` | `"."` | The directory to copy artifacts into. |
 | `work_dir` | `"."` | The directory to run the commands in. All artifact patterns are relative to this directory. |
 | `clean_artifacts` | `true` | Whether to clean files from the `out_dir` that match the artifact patterns before running the commands. |
 | `clean_out_dir` | `false` | Whether to clean the `out_dir` before running the commands. |

@@ -88,7 +88,7 @@ class OneScriptConfig:
     """The commands to run"""
 
     artifacts: Sequence[str]
-    """A list of file patterns relative to the work_dir to save as build artifacts"""
+    """Git file patterns relative to the work_dir to save as build artifacts"""
 
     out_dir: str
     """The path where build artifacts will be saved"""
@@ -103,7 +103,6 @@ class OneScriptConfig:
     """Whether to clean the output directory before running the scripts"""
 
     def __post_init__(self) -> None:
-        self.artifacts = [conv_path(a) for a in self.artifacts]
         self.out_dir = conv_path(self.out_dir)
         self.work_dir = conv_path(self.work_dir)
 

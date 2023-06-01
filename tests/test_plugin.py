@@ -57,7 +57,7 @@ def test_plugin(tmpdir):
     with proj.dist() as dist:
         files = {file.filename for file in dist.filelist}
 
-        assert joinpath("fake", "fake.txt") in files
-        assert joinpath("some-dir-out", "module.py") in files
-        assert joinpath("another-dir-out", "module.py") not in files
-        assert joinpath("some-dir-out", "f3.txt") not in files
+        assert "fake/fake.txt" in files
+        assert "some-dir-out/module.py" in files
+        assert "another-dir-out/module.py" not in files
+        assert "some-dir-out/f3.txt" not in files

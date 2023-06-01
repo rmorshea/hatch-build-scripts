@@ -1,5 +1,3 @@
-from os.path import join as joinpath
-
 from hatch_build_scripts.plugin import OneScriptConfig
 
 from .utils import create_project

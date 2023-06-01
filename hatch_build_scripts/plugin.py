@@ -45,7 +45,7 @@ class BuildScriptsHook(BuildHookInterface):
                 run(cmd, cwd=str(work_dir), check=True, shell=True)  # noqa: S602
 
             logger.info(f"Copying artifacts to {out_dir}")
-            for artifact_file in script.artifacts_spec.match_tree(work_dir):
+            for artifact_file in script.artifact_files():
                 src_file = work_dir / artifact_file
                 out_file = out_dir / artifact_file
                 if src_file not in created:
@@ -104,6 +104,9 @@ class OneScriptConfig:
         if not out_dir.exists():
             return []
         return [Path(root, self.out_dir, f) for f in self.artifacts_spec.match_tree(out_dir)]
+
+    def artifact_files(self) -> Sequence[str]:
+        return list(map(conv_path, self.artifacts_spec.match_tree(self.work_dir)))
 
     @cached_property
     def artifacts_spec(self) -> pathspec.PathSpec:

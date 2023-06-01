@@ -20,6 +20,6 @@ jobs:
     uses: ./.github/workflows/.hatch-run.yml
     with:
       job-name: "python-{0} {1}"
-      hatch-run: "test-py --no-cov"
+      hatch-run: "test"
       runs-on-array: '["ubuntu-latest", "macos-latest", "windows-latest"]'
       python-version-array: '["3.9", "3.10", "3.11"]'

@@ -105,8 +105,8 @@ class OneScriptConfig:
             return []
         return [Path(root, self.out_dir, f) for f in self.artifacts_spec.match_tree(out_dir)]
 
-    def artifact_files(self) -> Sequence[str]:
-        return list(map(conv_path, self.artifacts_spec.match_tree(self.work_dir)))
+    def artifact_files(self) -> Sequence[Path]:
+        return [Path(conv_path(p)) for p in self.artifacts_spec.match_tree(self.work_dir)]
 
     @cached_property
     def artifacts_spec(self) -> pathspec.PathSpec:

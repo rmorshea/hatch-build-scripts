@@ -43,7 +43,6 @@ jobs:
         run: pip install hatch
       - name: Run Scripts
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.node-auth-token }}
           PYPI_USERNAME: ${{ secrets.pypi-username }}
           PYPI_PASSWORD: ${{ secrets.pypi-password }}
         run: hatch run ${{ inputs.hatch-run }}

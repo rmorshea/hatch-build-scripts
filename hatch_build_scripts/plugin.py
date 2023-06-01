@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import shutil
-from dataclasses import dataclass
+from dataclasses import MISSING, dataclass, fields
 from functools import cached_property
 from pathlib import Path
 from subprocess import run
@@ -27,7 +27,7 @@ class BuildScriptsHook(BuildHookInterface):
 
         all_scripts = load_scripts(self.config)
 
-        for script in all_scripts.scripts:
+        for script in all_scripts:
             if script.clean_out_dir:
                 out_dir = Path(self.root, script.out_dir)
                 logger.info(f"Cleaning {out_dir}")
@@ -36,7 +36,7 @@ class BuildScriptsHook(BuildHookInterface):
                 for file in script.out_files(self.root):
                     file.unlink(missing_ok=True)
 
-        for script in all_scripts.scripts:
+        for script in all_scripts:
             work_dir = Path(self.root, script.work_dir)
             out_dir = Path(self.root, script.out_dir)
             out_dir.mkdir(parents=True, exist_ok=True)
@@ -56,28 +56,13 @@ class BuildScriptsHook(BuildHookInterface):
             build_data["artifacts"].append(str(out_dir.relative_to(self.root)))
 
 
-def load_scripts(config: dict[str, Any]) -> AllScriptsConfig:
-    script_defaults = {
-        "work_dir": config.get("work_dir", "."),
-        "out_dir": config.get("out_dir", "."),
-        "clean_artifacts": config.get("clean_artifacts", True),
-        "clean_out_dir": config.get("clean_out_dir", False),
-    }
-
-    return AllScriptsConfig(
-        scripts=[
-            OneScriptConfig(**{**script_defaults, **script_config})
-            for script_config in config.get("scripts", [])
-        ],
-    )
-
-
-@dataclass
-class AllScriptsConfig:
-    """A configuration for a set of build scripts."""
-
-    scripts: Sequence[OneScriptConfig]
-    """A list of build scripts to run"""
+def load_scripts(config: dict[str, Any]) -> Sequence[OneScriptConfig]:
+    script_defaults = dataclass_defaults(OneScriptConfig)
+    script_defaults.update({k: config[k] for k in script_defaults if k in config})
+    return [
+        OneScriptConfig(**{**script_defaults, **script_config})
+        for script_config in config.get("scripts", [])
+    ]
 
 
 @dataclass
@@ -90,16 +75,16 @@ class OneScriptConfig:
     artifacts: Sequence[str]
     """Git file patterns relative to the work_dir to save as build artifacts"""
 
-    out_dir: str
+    out_dir: str = "."
     """The path where build artifacts will be saved"""
 
-    work_dir: str
+    work_dir: str = "."
     """The path where the build script will be run"""
 
-    clean_artifacts: bool
+    clean_artifacts: bool = True
     """Whether to clean the build directory before running the scripts"""
 
-    clean_out_dir: bool
+    clean_out_dir: bool = False
     """Whether to clean the output directory before running the scripts"""
 
     def __post_init__(self) -> None:
@@ -124,6 +109,16 @@ class OneScriptConfig:
     def artifacts_spec(self) -> pathspec.GitIgnoreSpec:
         """A pathspec for the artifacts."""
         return pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, self.artifacts)
+
+
+def dataclass_defaults(obj: Any) -> dict[str, Any]:
+    defaults: dict[str, Any] = {}
+    for f in fields(obj):
+        if f.default is not MISSING:
+            defaults[f.name] = f.default
+        elif f.default_factory is not MISSING:
+            defaults[f.name] = f.default_factory()
+    return defaults
 
 
 def conv_path(path: str) -> str:

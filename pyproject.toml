@@ -35,7 +35,6 @@ path = "hatch_build_scripts/__init__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "coverage[toml]>=6.5",
   "pytest",
   "hatch",
   "toml",
@@ -43,15 +42,6 @@ dependencies = [
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
 
 [project.entry-points.hatch]
 build-script = "hatch_build_scripts.hooks"
@@ -138,22 +128,3 @@ ban-relative-imports = "all"
 [tool.ruff.per-file-ignores]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
-
-[tool.coverage.run]
-source_pkgs = ["hatch_build_scripts", "tests"]
-branch = true
-parallel = true
-omit = [
-  "hatch_build_scripts/__init__.py",
-]
-
-[tool.coverage.paths]
-hatch_build_scripts = ["hatch_build_scripts", "*/hatch-build-scripts/hatch_build_scripts"]
-tests = ["tests", "*/hatch-build-scripts/tests"]
-
-[tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]

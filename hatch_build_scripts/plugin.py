@@ -55,6 +55,8 @@ class BuildScriptsHook(BuildHookInterface):
 
             build_data["artifacts"].append(str(out_dir.relative_to(self.root)))
 
+        print(build_data["artifacts"])
+
 
 def load_scripts(config: dict[str, Any]) -> Sequence[OneScriptConfig]:
     script_defaults = dataclass_defaults(OneScriptConfig)

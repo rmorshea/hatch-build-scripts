@@ -1,3 +1,5 @@
+from os.path import join as joinpath
+
 from hatch_build_scripts.plugin import OneScriptConfig
 
 from .utils import create_project
@@ -55,7 +57,7 @@ def test_plugin(tmpdir):
     with proj.dist() as dist:
         files = {file.filename for file in dist.filelist}
 
-        assert "fake/fake.txt" in files
-        assert "some-dir-out/module.py" in files
-        assert "another-dir-out/module.py" not in files
-        assert "some-dir-out/f3.txt" not in files
+        assert joinpath("fake", "fake.txt") in files
+        assert joinpath("some-dir-out", "module.py") in files
+        assert joinpath("another-dir-out", "module.py") not in files
+        assert joinpath("some-dir-out", "f3.txt") not in files

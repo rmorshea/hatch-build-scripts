@@ -41,7 +41,7 @@ dependencies = [
   "build",
 ]
 [tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
+test = "pytest -vv {args:tests}"
 
 [project.entry-points.hatch]
 build-script = "hatch_build_scripts.hooks"

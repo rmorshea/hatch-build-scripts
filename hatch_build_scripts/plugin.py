@@ -22,7 +22,7 @@ class BuildScriptsHook(BuildHookInterface):
         self,
         version: str,  # noqa: ARG002
         build_data: dict[str, Any],
-    ) -> bool | None:
+    ) -> None:
         created: set[Path] = set()
 
         all_scripts = load_scripts(self.config)
@@ -33,8 +33,8 @@ class BuildScriptsHook(BuildHookInterface):
                 logger.info(f"Cleaning {out_dir}")
                 shutil.rmtree(out_dir, ignore_errors=True)
             elif script.clean_artifacts:
-                for file in script.out_files(self.root):
-                    file.unlink(missing_ok=True)
+                for out_file in script.out_files(self.root):
+                    out_file.unlink(missing_ok=True)
 
         for script in all_scripts:
             work_dir = Path(self.root, script.work_dir)
@@ -45,9 +45,9 @@ class BuildScriptsHook(BuildHookInterface):
                 run(cmd, cwd=str(work_dir), check=True, shell=True)  # noqa: S602
 
             logger.info(f"Copying artifacts to {out_dir}")
-            for file in script.artifacts_spec.match_tree(work_dir):
-                src_file = work_dir / file
-                out_file = out_dir / file
+            for artifact_file in script.artifacts_spec.match_tree(work_dir):
+                src_file = work_dir / artifact_file
+                out_file = out_dir / artifact_file
                 if src_file not in created:
                     out_file.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copyfile(src_file, out_file)
@@ -106,7 +106,7 @@ class OneScriptConfig:
         return [Path(root, self.out_dir, f) for f in self.artifacts_spec.match_tree(out_dir)]
 
     @cached_property
-    def artifacts_spec(self) -> pathspec.GitIgnoreSpec:
+    def artifacts_spec(self) -> pathspec.PathSpec:
         """A pathspec for the artifacts."""
         return pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, self.artifacts)
 

@@ -3,16 +3,19 @@ from __future__ import annotations
 import logging
 import os
 import shutil
-from dataclasses import MISSING, dataclass, fields
+from collections.abc import Sequence
+from dataclasses import MISSING, asdict, dataclass, fields
 from functools import cached_property
 from pathlib import Path
 from subprocess import run
-from typing import Any, Sequence
+from typing import Any
 
 import pathspec
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
+log_level = logging.getLevelName(os.getenv("HATCH_BUILD_SCRIPTS_LOG_LEVEL", "INFO"))
+log.setLevel(log_level)
 
 
 class BuildScriptsHook(BuildHookInterface):
@@ -30,28 +33,34 @@ class BuildScriptsHook(BuildHookInterface):
         for script in all_scripts:
             if script.clean_out_dir:
                 out_dir = Path(self.root, script.out_dir)
-                logger.info(f"Cleaning {out_dir}")
+                log.debug(f"Cleaning {out_dir}")
                 shutil.rmtree(out_dir, ignore_errors=True)
             elif script.clean_artifacts:
                 for out_file in script.out_files(self.root):
+                    log.debug(f"Cleaning {out_file}")
                     out_file.unlink(missing_ok=True)
 
         for script in all_scripts:
+            log.debug(f"Script config: {asdict(script)}")
             work_dir = Path(self.root, script.work_dir)
             out_dir = Path(self.root, script.out_dir)
             out_dir.mkdir(parents=True, exist_ok=True)
 
             for cmd in script.commands:
+                log.info(f"Running command: {cmd}")
                 run(cmd, cwd=str(work_dir), check=True, shell=True)  # noqa: S602
 
-            logger.info(f"Copying artifacts to {out_dir}")
-            for artifact_file in script.artifact_files():
-                src_file = work_dir / artifact_file
-                out_file = out_dir / artifact_file
+            log.info(f"Copying artifacts to {out_dir}")
+            for work_file in script.work_files(self.root, relative=True):
+                src_file = work_dir / work_file
+                out_file = out_dir / work_file
+                log.debug(f"Copying {src_file} to {out_file}")
                 if src_file not in created:
                     out_file.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copyfile(src_file, out_file)
                     created.add(out_file)
+                else:
+                    log.debug(f"Skipping {src_file} - already exists")
 
             build_data["artifacts"].append(str(out_dir.relative_to(self.root)))
 
@@ -91,27 +100,32 @@ class OneScriptConfig:
         self.out_dir = conv_path(self.out_dir)
         self.work_dir = conv_path(self.work_dir)
 
-    def work_files(self, root: str | Path) -> Sequence[Path]:
-        """Get the files that will be used by the script."""
-        work_dir = Path(root, self.work_dir)
-        if not work_dir.exists():
+    def work_files(self, root: str | Path, *, relative: bool = False) -> Sequence[Path]:
+        """Get files in the work directory that match the artifacts spec."""
+        abs_dir = Path(root, self.work_dir)
+        if not abs_dir.exists():
             return []
-        return [Path(root, self.work_dir, f) for f in self.artifacts_spec.match_tree(work_dir)]
+        return [
+            Path(f) if relative else abs_dir / f
+            for f in self.artifacts_spec.match_tree(abs_dir)
+        ]
 
-    def out_files(self, root: str | Path) -> Sequence[Path]:
-        """Get the files that will be created by the script."""
-        out_dir = Path(root, self.out_dir)
-        if not out_dir.exists():
+    def out_files(self, root: str | Path, *, relative: bool = False) -> Sequence[Path]:
+        """Get files in the output directory that match the artifacts spec."""
+        abs_dir = Path(root, self.out_dir)
+        if not abs_dir.exists():
             return []
-        return [Path(root, self.out_dir, f) for f in self.artifacts_spec.match_tree(out_dir)]
-
-    def artifact_files(self) -> Sequence[Path]:
-        return [Path(conv_path(p)) for p in self.artifacts_spec.match_tree(self.work_dir)]
+        return [
+            Path(f) if relative else abs_dir / f
+            for f in self.artifacts_spec.match_tree(abs_dir)
+        ]
 
     @cached_property
     def artifacts_spec(self) -> pathspec.PathSpec:
         """A pathspec for the artifacts."""
-        return pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, self.artifacts)
+        return pathspec.PathSpec.from_lines(
+            pathspec.patterns.GitWildMatchPattern, self.artifacts
+        )
 
 
 def dataclass_defaults(obj: Any) -> dict[str, Any]:

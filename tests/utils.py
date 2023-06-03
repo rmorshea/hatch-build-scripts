@@ -3,10 +3,10 @@ from __future__ import annotations
 import subprocess
 import sys
 import zipfile
+from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import asdict
 from pathlib import Path
-from typing import Iterator, Sequence
 
 import toml
 
@@ -53,7 +53,7 @@ class FakeProject:
 
     def build(self) -> None:
         subprocess.run(
-            [  # noqa: S603
+            [
                 sys.executable,
                 "-m",
                 "pip",
@@ -65,7 +65,9 @@ class FakeProject:
             check=True,
         )
         subprocess.run(
-            [sys.executable, "-m", "hatch", "build"], cwd=self.path, check=True  # noqa: S603
+            [sys.executable, "-m", "hatch", "build"],
+            cwd=self.path,
+            check=True,
         )
 
     @contextmanager

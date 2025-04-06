@@ -64,7 +64,7 @@ class BuildScriptsHook(BuildHookInterface):
                 src_file = work_dir / work_file
                 out_file = out_dir / work_file
                 log.debug("Copying %s to %s", src_file, out_file)
-                if src_file not in created:
+                if src_file not in created and src_file != out_file:
                     out_file.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copyfile(src_file, out_file)
                     shutil.copystat(src_file, out_file)

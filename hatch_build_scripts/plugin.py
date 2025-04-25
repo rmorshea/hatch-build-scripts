@@ -58,6 +58,7 @@ class BuildScriptsHook(BuildHookInterface):
                 if src_file not in created:
                     out_file.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copyfile(src_file, out_file)
+                    shutil.copystat(src_file, out_file)
                     created.add(out_file)
                 else:
                     log.debug(f"Skipping {src_file} - already exists")

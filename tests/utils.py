@@ -3,15 +3,20 @@ from __future__ import annotations
 import subprocess
 import sys
 import zipfile
-from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import asdict
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import toml
 
 import hatch_build_scripts
-from hatch_build_scripts.plugin import OneScriptConfig
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from collections.abc import Sequence
+
+    from hatch_build_scripts.plugin import OneScriptConfig
 
 ROOT_DIR = Path(__file__).parent.parent
 

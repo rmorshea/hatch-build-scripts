@@ -4,7 +4,8 @@ import os
 import subprocess
 from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
+from typing import Literal
 
 import click
 
@@ -25,9 +26,7 @@ def test(args: list[str]):
 
 @main.command("cov")
 @click.option("--no-test", is_flag=True, help="Skip running tests with coverage")
-@click.option(
-    "--old-coverage-xml", default=None, type=str, help="Path to target coverage.xml."
-)
+@click.option("--old-coverage-xml", default=None, type=str, help="Path to target coverage.xml.")
 def cov(no_test: bool, old_coverage_xml: str | None):
     """Run the test suite with coverage."""
     if not no_test:
@@ -63,9 +62,7 @@ def cov(no_test: bool, old_coverage_xml: str | None):
 @click.option("--no-md-style", is_flag=True, help="Skip style check Markdown files.")
 @click.option("--no-py-style", is_flag=True, help="Skip style check Python files.")
 @click.option("--no-py-types", is_flag=True, help="Skip type check Python files.")
-@click.option(
-    "--no-uv-locked", is_flag=True, help="Skip check that the UV lock file is synced"
-)
+@click.option("--no-uv-locked", is_flag=True, help="Skip check that the UV lock file is synced")
 @click.option("--no-yml-style", is_flag=True, help="Skip style check YAML files.")
 def lint(
     check: bool,

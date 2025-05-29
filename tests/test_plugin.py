@@ -1,6 +1,5 @@
 from hatch_build_scripts.plugin import OneScriptConfig
-
-from .utils import create_project
+from tests.utils import create_project
 
 
 def test_plugin(tmpdir):

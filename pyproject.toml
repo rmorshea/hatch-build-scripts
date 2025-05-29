@@ -20,7 +20,7 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python",
 ]
-dependencies = []
+dependencies = ["hatchling"]
 [project.urls]
 Source = "https://github.com/rmorshea/hatch-build-scripts"
 
@@ -105,6 +105,7 @@ ignore = [
     "RET503", # Explicit return
     "RET505", # Unnecessary return statement after return
     "S105",   # Ignore checks for possible passwords
+    "S404",   # Ignore subprocess import
     "SIM117", # Use a single `with` statement
     "ISC001", # implicitly concatenated strings on a single line
 ]
@@ -125,6 +126,7 @@ ban-relative-imports = "all"
     "S101",    # Assert statements
     "D",       # Docstrings
     "ANN",     # Type annotations
+    "S",       # Security issues
 ]
 "**.ipynb" = [
     "T201", # Print statements

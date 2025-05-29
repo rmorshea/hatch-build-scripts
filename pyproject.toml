@@ -9,7 +9,7 @@ packages = ["src/hatch_build_scripts"]
 
 [project]
 name = "hatch_build_scripts"
-version = "0.0.5"
+version = "1.0.0"
 description = "Dependency injection without the boilerplate."
 readme = "README.md"
 requires-python = ">=3.10,<4"

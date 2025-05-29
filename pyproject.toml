@@ -12,7 +12,7 @@ name = "hatch_build_scripts"
 version = "0.0.5"
 description = "Dependency injection without the boilerplate."
 readme = "README.md"
-requires-python = ">=3.9,<4"
+requires-python = ">=3.10,<4"
 license = { file = "LICENSE.txt" }
 keywords = []
 authors = [{ name = "Ryan Morshead", email = "ryan.morshead@gmail.com" }]

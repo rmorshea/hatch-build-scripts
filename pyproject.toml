@@ -2,128 +2,176 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[project]
-name = "hatch-build-scripts"
-dynamic = ["version"]
-description = 'A plugin for Hatch for writing build scripts'
-readme = "README.md"
-requires-python = ">=3.9"
-license = "MIT"
-keywords = []
-authors = [
-  { name = "rmorshea", email = "ryan.morshead@gmail.com" },
-]
-classifiers = [
-  "Framework :: Hatch",
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
-]
-dependencies = ["pathspec", "hatchling"]
+[tool.hatch.build.targets.sdist]
+include = ["src/hatch_build_scripts", "docs"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/hatch_build_scripts"]
 
+[project]
+name = "hatch_build_scripts"
+version = "0.0.5"
+description = "Dependency injection without the boilerplate."
+readme = "README.md"
+requires-python = ">=3.11,<4"
+license = { file = "LICENSE.txt" }
+keywords = []
+authors = [{ name = "Ryan Morshead", email = "ryan.morshead@gmail.com" }]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+]
+dependencies = []
 [project.urls]
-Documentation = "https://github.com/rmorshea/hatch-build-scripts#readme"
-Issues = "https://github.com/rmorshea/hatch-build-scripts/issues"
 Source = "https://github.com/rmorshea/hatch-build-scripts"
 
-[tool.hatch.version]
-path = "hatch_build_scripts/__init__.py"
-
-[tool.hatch.envs.default]
-dependencies = [
-  "pytest",
-  "hatch",
-  "toml",
-  "build",
+[dependency-groups]
+dev = [
+    { include-group = "util" },
+    { include-group = "docs" },
+    { include-group = "lint" },
+    { include-group = "test" },
 ]
-[tool.hatch.envs.default.scripts]
-test = "pytest -vv {args:tests}"
-
-[project.entry-points.hatch]
-build-script = "hatch_build_scripts.hooks"
-
-[tool.hatch.envs.lint]
-detached = true
-dependencies = [
-  "black>=23.1.0",
-  "mypy>=1.0.0",
-  "ruff>=0.0.243",
-  "hatchling",
+util = ["click==8.1.7", "ipykernel==6.29.5", "copier==9.4.1"]
+docs = [
+    { include-group = "test" },
+    "mkdocs-gen-files==0.5.0",
+    "mkdocs-literate-nav==0.6.1",
+    "mkdocs-material==9.5.39",
+    "mkdocs-open-in-new-tab==1.0.5",
+    "mkdocs==1.6.1",
+    "mkdocstrings-python==1.13.0",
 ]
-[tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:hatch_build_scripts tests}"
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
+lint = [
+    { include-group = "test" },
+    "mdformat-admon @ git+https://github.com/rmorshea/mdformat-admon.git@0e513d7a2c265faf74441938ccbd1010660609f4",
+    "mdformat-mkdocs==3.1.1",
+    "mdformat-pyproject==0.0.1",
+    "mdformat-tables==1.0.0",
+    "mdformat==0.7.19",
+    "pyright==1.1.389",
+    "ruff==0.7.3",
+    "yamlfix==1.17.0",
+    "doccmd==2024.11.14",
 ]
-fix = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
+test = [
+    "coverage[toml]==7.6.1",
+    "diff-cover==9.2.0",
+    "pycobertura==3.3.2",
+    "pytest-asyncio==0.24.0",
+    "pytest-examples==0.0.13",
+    "pytest==8.3.3",
 ]
 
-[tool.black]
-target-version = ["py39"]
-skip-string-normalization = true
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
-target-version = "py39"
-select = [
-  "A",
-  "ARG",
-  "B",
-  "C",
-  "DTZ",
-  "E",
-  "EM",
-  "F",
-  "FBT",
-  "I",
-  "ICN",
-  "ISC",
-  "N",
-  "PLC",
-  "PLE",
-  "PLR",
-  "PLW",
-  "Q",
-  "RUF",
-  "S",
-  "T",
-  "TID",
-  "UP",
-  "W",
-  "YTT",
-]
+line-length = 100
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint]
+preview = true
+select = ["ALL"]
 ignore = [
-  # Allow non-abstract empty methods in abstract base classes
-  "B027",
-  # Allow boolean positional values in function calls, like `dict.get(... True)`
-  "FBT003",
-  # Ignore checks for possible passwords
-  "S105", "S106", "S107",
-  # Ignore complexity
-  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+    "A005",   # Module shadowing built-in
+    "ANN",    # Let pyright handle annotations
+    "ANN401", # Allow Any type hints
+    "ARG005", # Unused lambda argument
+    "B027",   # Allow non-abstract empty methods in abstract base classes
+    "B039",   # Mutable default for contextvars
+    "C901",   # Ignore complexity
+    "COM812", # Trailing comma
+    "CPY001", # Copyright at top of file
+    "D100",   # Docstring for module
+    "D104",   # Ignore missing docstring for __init__.py
+    "D105",   # Docstring for magic method
+    "D107",   # Docstring for __init__ method
+    "D203",   # One blank line before class
+    "D213",   # Multi-line docstring summary second line
+    "D407",   # Docstring dashes under section names
+    "D413",   # Docstring blank line after last section
+    "DOC201", # Return type documentation
+    "DOC402", # Yield type documentation
+    "DOC501", # Ignore raises missing from docstring
+    "ERA001", # Commented out code
+    "FBT003", # Allow boolean positional values in function calls, like `dict.get(... True)`
+    "PL",     # PyLint
+    "PYI",    # Stub files
+    "RET503", # Explicit return
+    "RET505", # Unnecessary return statement after return
+    "S105",   # Ignore checks for possible passwords
+    "SIM117", # Use a single `with` statement
+    "ISC001", # implicitly concatenated strings on a single line
 ]
 unfixable = [
-  # Don't touch unused imports
-  "F401",
+    "COM819", # Trailing comma
+]
+fixable = ["ALL"]
+extend-safe-fixes = ["TCH"]
+[tool.ruff.lint.isort]
+known-first-party = ["hatch_build_scripts"]
+force-single-line = true
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "PLC2701", # Private imports
+    "RUF029",  # Async functions without await
+    "S101",    # Assert statements
+    "D",       # Docstrings
+    "ANN",     # Type annotations
+]
+"**.ipynb" = [
+    "T201", # Print statements
+]
+"docs/**" = [
+    "INP001", # Implicit namespace package
+    "D",      # Docstrings
+]
+"doccmd_*.py" = [
+    "ANN",    # Type annotations
+    "B018",   # Useless expression
+    "FA102",  # Unsafe __futures__ annotations usage
+    "RUF029", # No await in async function
+    "S101",   # Assert statements
+    "S106",   # Possible passwords
+    "SIM115", # Use context manager for opening files
+    "T201",   # Print
+    "TCH002", # Move third-party import into a type-checking block
 ]
 
-[tool.ruff.isort]
-known-first-party = ["hatch_build_scripts"]
+[tool.yamlfix]
+line_length = 100
 
-[tool.ruff.flake8-tidy-imports]
-ban-relative-imports = "all"
+[tool.coverage.run]
+source_pkgs = ["hatch_build_scripts", "tests"]
+branch = true
+omit = []
 
-[tool.ruff.per-file-ignores]
-# Tests can use magic values, assertions, and relative imports
-"tests/**/*" = ["PLR2004", "S101", "TID252", "S603"]
+[tool.coverage.paths]
+hatch_build_scripts = ["src"]
+tests = ["tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "# nocov",
+    "@overload",
+    "if TYPE_CHECKING:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    'if __name__ == .__main__.:',
+    '\.\.\.\n($|\s*#.*)',
+]
+show_missing = true
+skip_covered = true
+sort = "Name"
+
+[tool.diff_cover]
+compare_branch = "origin/main"
+fail_under = 100
+include_untracked = true

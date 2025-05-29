@@ -1,0 +1,10 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v2025.02.0
+_src_path: https://github.com/rmorshea/python-copier-template
+author_email: ryan.morshead@gmail.com
+author_name: Ryan Morshead
+project_description: A Hatch plugin for creating build scripts.
+project_title: Hatch Build Scripts
+python_package_name: hatch_build_scripts
+python_version_range: '>=3.9'
+repo_url: https://github.com/rmorshea/hatch-build-scripts

@@ -1,8 +1,8 @@
 # ruff: noqa: S607,S603,S404,FBT001,D401,D103
+from __future__ import annotations
 
 import os
 import subprocess
-from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Literal
@@ -59,14 +59,12 @@ def cov(no_test: bool, old_coverage_xml: str | None):
 
 @main.command("lint")
 @click.option("--check", is_flag=True, help="Check for linting issues without fixing.")
-@click.option("--no-md-style", is_flag=True, help="Skip style check Markdown files.")
 @click.option("--no-py-style", is_flag=True, help="Skip style check Python files.")
 @click.option("--no-py-types", is_flag=True, help="Skip type check Python files.")
 @click.option("--no-uv-locked", is_flag=True, help="Skip check that the UV lock file is synced")
 @click.option("--no-yml-style", is_flag=True, help="Skip style check YAML files.")
 def lint(
     check: bool,
-    no_md_style: bool,
     no_py_style: bool,
     no_py_types: bool,
     no_uv_locked: bool,
@@ -82,23 +80,6 @@ def lint(
         else:
             run(["ruff", "format"])
             run(["ruff", "check", "--fix"])
-    if not no_md_style:
-        if check:
-            run(
-                [
-                    "mdformat",
-                    "--ignore-missing-references",
-                    "--check",
-                    "README.md",
-                    "docs",
-                ]
-            )
-            doc_cmd(["ruff", "format", "--check"], no_pad=True)
-            doc_cmd(["ruff", "check"], no_pad=True)
-        else:
-            run(["mdformat", "--ignore-missing-references", "README.md", "docs"])
-            doc_cmd(["ruff", "format"], no_pad=True)
-            doc_cmd(["ruff", "check", "--fix"], no_pad=True)
     if not no_yml_style:
         if check:
             run(["yamlfix", "--check", "docs", ".github"])
@@ -108,36 +89,9 @@ def lint(
         run(["pyright"])
 
 
-@main.group("docs")
-def docs():
-    """Documentation commands."""
-
-
-@docs.command("build")
-def docs_build():
-    """Build documentation."""
-    run(["mkdocs", "build", "-f", "docs/mkdocs.yml"])
-
-
-@docs.command("publish")
-def docs_publish():
-    """Publish documentation."""
-    run(["mkdocs", "gh-deploy", "-f", "docs/mkdocs.yml"])
-
-
-@docs.command("serve")
-def docs_serve():
-    """Serve documentation."""
-    run(["mkdocs", "serve", "-f", "docs/mkdocs.yml"])
-
-
-@docs.command("fix")
-def fix():
-    """Fix style issues."""
-    run(["pytest", "tests/test_docs.py", "--update-examples"])
-
-
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     run = subprocess.run
 else:
 

@@ -109,7 +109,7 @@ class OneScriptConfig:
     commands: Sequence[str]
     """The commands to run"""
 
-    artifacts: Sequence[str]
+    artifacts: Sequence[str] = ()
     """Git file patterns relative to the work_dir to save as build artifacts"""
 
     out_dir: str = "."

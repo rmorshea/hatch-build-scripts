@@ -82,9 +82,9 @@ def lint(
             run(["ruff", "check", "--fix"])
     if not no_yml_style:
         if check:
-            run(["yamlfix", "--check", "docs", ".github"])
+            run(["yamlfix", "--check", ".github"])
         else:
-            run(["yamlfix", "docs", ".github"])
+            run(["yamlfix", ".github"])
     if not no_py_types:
         run(["pyright"])
 

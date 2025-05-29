@@ -65,6 +65,22 @@ class BuildScriptsHook(BuildHookInterface):
 
             build_data["artifacts"].append(str(out_dir.relative_to(self.root)))
 
+    def finalize(
+        self,
+        version: str,  # noqa: ARG002
+        build_data: dict[str, Any],  # noqa: ARG002
+        artifact_path: str,  # noqa: ARG002
+    ) -> None:
+        all_scripts = load_scripts(self.config)
+
+        for script in all_scripts:
+            if not script.clean_artifacts_after_build:
+                continue
+
+            for out_file in script.out_files(self.root):
+                log.debug(f"After build, cleaning {out_file}")
+                out_file.unlink(missing_ok=True)
+
 
 def load_scripts(config: dict[str, Any]) -> Sequence[OneScriptConfig]:
     script_defaults = dataclass_defaults(OneScriptConfig)
@@ -96,6 +112,9 @@ class OneScriptConfig:
 
     clean_out_dir: bool = False
     """Whether to clean the output directory before running the scripts"""
+
+    clean_artifacts_after_build: bool = False
+    """Whether to clean the build directory after running the scripts"""
 
     def __post_init__(self) -> None:
         self.out_dir = conv_path(self.out_dir)

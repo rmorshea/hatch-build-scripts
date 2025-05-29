@@ -9,6 +9,7 @@ def test_plugin(tmpdir):
 
     (tmp_lib_dir / "some-dir").mkdir()
     (tmp_lib_dir / "another-dir").mkdir()
+    (tmp_lib_dir / "yet-another-dir").mkdir()
 
     some_dir_out = tmp_lib_dir / "some-dir-out"
     some_dir_out.mkdir()
@@ -50,6 +51,17 @@ def test_plugin(tmpdir):
                 artifacts=["*.txt"],
                 clean_out_dir=True,
             ),
+            OneScriptConfig(
+                out_dir="yet-another-dir-out",
+                work_dir="yet-another-dir",
+                commands=[
+                    "echo 'hello world' > f1.txt",
+                    "echo 'hello world' > f2.txt",
+                ],
+                artifacts=["*.txt"],
+                clean_out_dir=True,
+                clean_artifacts_after_build=True,
+            ),
         ],
     )
 
@@ -66,3 +78,9 @@ def test_plugin(tmpdir):
 
         assert not (extract_dir / "some-dir-out" / "f3.txt").exists()
         assert not (extract_dir / "another-dir-out" / "module.py").exists()
+
+        # we expect that this file still exists in the source
+        assert (tmp_lib_dir / "fake" / "fake.txt").exists()
+        # we expect that this file was cleaned in the source but exists in wheel
+        assert (extract_dir / "yet-another-dir-out" / "f1.txt").exists()
+        assert not (tmp_lib_dir / "yet-another-dir-out" / "f1.txt").exists()

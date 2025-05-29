@@ -1,16 +1,18 @@
+---
 name: Plan a Task
 description: Create a detailed plan of action (ONLY START AFTER DISCUSSION PLEASE 🙏).
-labels: ["flag-triage"]
+labels: [flag-triage]
 body:
-- type: textarea
-  attributes:
-    label: Current Situation
-    description: Discuss how things currently are, why they require action, and any relevant prior discussion/context.
-  validations:
-    required: false
-- type: textarea
-  attributes:
-    label: Proposed Actions
-    description: Describe what ought to be done, and why that will address the reasons for action mentioned above.
-  validations:
-    required: false
+  - type: textarea
+    attributes:
+      label: Current Situation
+      description: Discuss how things currently are, why they require action, and any relevant prior discussion/context.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Proposed Actions
+      description: Describe what ought to be done, and why that will address the reasons for action mentioned
+        above.
+    validations:
+      required: false
